@@ -1,0 +1,125 @@
+from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.recycleview import RecycleView
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
+from kivy.uix.label import Label
+from kivy.properties import BooleanProperty
+from kivy.uix.recycleboxlayout import RecycleBoxLayout
+from kivy.uix.behaviors import FocusBehavior
+from kivy.uix.recycleview.layout import LayoutSelectionBehavior
+from kivy.uix.boxlayout import BoxLayout
+
+
+class NewsScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        label = Label(text="Bem-vindo à tela de notícias!")
+        self.add_widget(label)
+
+
+class NewsAdapter(RecycleDataViewBehavior, BoxLayout):
+    index = None
+    selected = BooleanProperty(False)
+    selectable = BooleanProperty(True)
+
+    def refresh_view_attrs(self, rv, index, data):
+        self.index = index
+        return super(NewsAdapter, self).refresh_view_attrs(rv, index, data)
+
+    def get_view(self, index):
+        news_item = Label(text=self.data[index]['title'],
+                          size_hint=(1, None),
+                          height=100,
+                          text_size=(400, None),
+                          halign='center',
+                          valign='middle',
+                          padding=(20, 20))
+        return news_item
+
+    def get_count(self):
+        return len(self.data)
+
+
+class NewsList(RecycleView):
+    def init(self, **kwargs):
+        super().init(**kwargs)
+        self.data = [{'title': 'Title 1', 'description': 'Description 1'},
+                     {'title': 'Title 2', 'description': 'Description 2'},
+                     {'title': 'Title 3', 'description': 'Description 3'}]
+        self.adapter = NewsAdapter()
+        self.adapter.data = self.data
+        self.adapter.get_view = self.get_view
+        self.adapter.get_count = self.get_count
+
+
+def get_view(self, index):
+    news_item = Label(text=self.data[index]['title'],
+                      size_hint=(1, None),
+                      height=100,
+                      text_size=(400, None),
+                      halign='center',
+                      valign='middle',
+                      padding=(20, 20))
+    return news_item
+
+
+def get_count(self):
+    return len(self.data)
+
+
+class CategoriesAdapter:
+    def __init__(self, data, **kwargs):
+        self.data = data
+
+    def get_view(self, index):
+        # Create a label for the category item
+        category_item = Label(text=self.data[index]["category"],
+                              size_hint=(1, None),
+                              height=100,
+                              text_size=(400, None),
+                              halign='center',
+                              valign='middle',
+                              padding=(20, 20))
+        return category_item
+
+    def get_count(self):
+        return len(self.data)
+
+
+class CategoriesList(RecycleView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.data = [{'category': 'Category 1', 'feed_url': 'https://feed1.com/rss'},
+                     {'category': 'Category 2', 'feed_url': 'https://feed2.com/rss'},
+                     {'category': 'Category 3', 'feed_url': 'https://feed3.com/rss'}]
+        self.viewclass = 'Label'
+        self.data = [{'text': item['category'], 'height': 100, 'size_hint_y': None}
+                     for item in self.data]
+
+    def get_count(self):
+        return len(self.data)
+
+
+class CategoriesAdapter(RecycleView):
+    pass
+
+    def get_view(self, index):
+        item = self.data[index]
+        label = Label(text=item['category'], size_hint=(1, None), height=100,
+                      text_size=(400, None), halign='center', valign='middle',
+                      padding=(20, 20))
+        return label
+
+
+class NewsApp(App):
+    def build(self):
+        layout = BoxLayout(orientation='vertical')
+        self.news_list = NewsList(size_hint=(1, 0.8))
+        layout.add_widget(self.news_list)
+        self.categories_list = CategoriesList(size_hint=(1, 0.2))
+        layout.add_widget(self.categories_list)
+        return layout
+
+
+if __name__ == "__main__":
+    NewsApp().run()
